@@ -1,0 +1,53 @@
+---
+title: "tretterl_posit_workshop"
+author: "Tretter_Lyons"
+format: html
+editor: visual
+---
+
+## Packages
+```{r}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(lubridate)
+library(plotly)
+```
+
+## Data Import
+```{r}
+claims <- read_csv("claims.csv")
+claims
+summary(claims)
+```
+
+## Data Cleaning
+```{r}
+claims_clean <- claims %>%
+  filter(!(STATUS1 %in% "BILLED")) %>%
+  select(PATIENTID, DEPARTMENTID, DIAGNOSIS1, SERVICEDATE, HEALTHCARECLAIMTYPEID1, HEALTHCARECLAIMTYPEID2) %>% 
+  mutate(date_YYYYMM = year(SERVICEDATE)*100 +  month(SERVICEDATE))
+  
+```
+
+## Data Exploration
+```{r}
+summary(claims_clean)
+range(claims_clean$date_YYYYMM)
+```
+
+## Data Visualization
+```{r}
+dv1 <- ggplot(claims_clean) +
+  aes(x = date_YYYYMM, fill = as.factor(HEALTHCARECLAIMTYPEID1)) +
+  geom_histogram(bins = 30L, position = "stack") +
+  scale_x_continuous(limits = c(197501, 202409)) +  # Adjust x-axis limits
+  theme_minimal() +
+  labs(fill = "Claim Type")
+
+ggplotly(dv1)
+
+```
+
+
+
